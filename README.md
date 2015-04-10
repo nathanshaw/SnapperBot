@@ -17,7 +17,7 @@ If it does not run, double check your port names in the code for the arduino :
 
 you can test the OSC using the osc_sender_test.ck files in the chuck folder, this will randomly spit out all the possible OSC values the python main code will be expecting (note by default the code uses port 40000 as this is the same port as the robot network in the Machine Lab)
 
-Note : 
+Note : THIS IS THE UNSTABLE TEST BRANCH - UNLESS YOU ARE A DEV USE THE MASTER BRANCH INSTEAD
 
 To Do :
     rewrite protocol to use only two bytes, with MSB as flag bit make .txt document explaining protocol like owens
