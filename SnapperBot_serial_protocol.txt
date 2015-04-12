@@ -1,0 +1,54 @@
+snapperbot serial protocol
+nathan villicana-shaw
+//based off of the chronome serial protocol
+//by owen vallis
+
+revision: 001
+
+
+from host to the master snapperbot:
+
+
+//flip one specific switch
+message id:		(0) single_switch
+bytes:			2
+format:		1.ii .sss  0.bb rrrr
+				i (message id) = 0
+				s (snapperbot number) = 0 - 5
+				b (bank number) = 0 - 3
+				r (relay switch number) = 0-7
+ecode:		???
+
+
+//flip more than one switch on one bank
+message id:		(1) multi_switch
+bytes:			2
+format:		1.ii .sss  0.bb rrrr
+				i (message id) = 1
+				s (snapperbot number) = 0 - 5
+				b (bank number) = 0 - 3
+				r (number of switches) = 0-7
+ecode:		???
+
+
+//flip switches on more than one bank
+message id:		(2) multi_bank
+bytes:			2
+format:		1.ii .sss  0.bb rrrr
+				i (message id) = 2
+				s (snapperbot number) = 0 - 5
+				b (number of banks) = 0 - 3
+				r (number of switches) = 0-7
+ecode:		???
+
+
+//flip switches one more than one bot
+message id:		(1) multi_bot
+bytes:			3
+format:		1.ii ....  0.ss ssss 0.bb rrrr
+				i (message id) = 3
+				s (slave send boolean) = LSB is the 5th slave
+				a (number of banks) = 0-3
+				r (number of switches) = 0-7
+ecode:		???
+
