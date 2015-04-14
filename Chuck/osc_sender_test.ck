@@ -1,6 +1,7 @@
 // launch with OSC_recv.ck
 
 // host name and port
+//"10.0.1.5" => string hostname;
 "localhost" => string hostname;
 40000 => int port;
 
@@ -12,7 +13,7 @@ if( me.args() > 1 ) me.arg(1) => Std.atoi => port;
 OscOut xmit;
 
 // aim the transmitter
-xmit.dest( hostname, port );
+xmit.dest( "10.0.1.5" , port );
 
 // infinite time loop
 while( true )
@@ -21,9 +22,11 @@ while( true )
     xmit.start( "/switch" );
     <<<"----------------">>>;
     // add float arg
-    Math.random2( 0, 5 ) => int temp => xmit.add;
+    //Math.random2( 0, 5 ) => int temp => xmit.add;
+    0 => int temp => xmit.add;
+    
     <<< temp >>>;
-    Math.random2( 0, 3 ) => temp => xmit.add;
+    Math.random2( 0, 2 ) => temp => xmit.add;
     <<< temp >>>;
     Math.random2( 1, 8 ) => temp => xmit.add;
     <<< temp >>>;

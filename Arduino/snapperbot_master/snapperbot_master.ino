@@ -106,6 +106,9 @@ void byteListener() {
     if (Serial.available()) {
 
       //read the first byte
+      while(!Serial.available())
+      {
+      };
       Serial.readBytes((char*)dataBytes, 3);
       //if it is equal to our flag value
       if (dataBytes[0] == 0xff) {

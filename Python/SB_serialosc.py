@@ -2,12 +2,13 @@ import serial, time, random, array
 #imports for OSC
 import OSC, threading
 #Serial initalize
-snapperBot = serial.Serial('/dev/tty/acm0', 9600, timeout = 0.1)
+snapperBot = serial.Serial('/dev/tty.usbmodem1421', 9600, timeout = 0.1)
 
 time.sleep(6)
 
 def switch_handler(addr, tags, stuff, source):
     multiSwitch(stuff[0], stuff[1], stuff[2])
+    print(addr, stuff[0], stuff[1], stuff[2])
 
 #this is for troubleshotting the OSC
 def printing_handler(addr, tags, stuff, source):
