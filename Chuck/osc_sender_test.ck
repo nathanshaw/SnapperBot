@@ -13,7 +13,7 @@ if( me.args() > 1 ) me.arg(1) => Std.atoi => port;
 OscOut xmit;
 
 // aim the transmitter
-xmit.dest( "10.0.1.5" , port );
+xmit.dest( hostname , port );
 
 // infinite time loop
 while( true )

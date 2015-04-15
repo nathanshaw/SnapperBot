@@ -131,8 +131,7 @@ void triggerEvent(int port) {
 }
 //
 void parseI2C(uint8_t data) {
-  //the mode is the 2 most significant bits
-  /the mode is the 2 most significant bits
+
     //shift those bits over 6 spaces and we have the mode
     mode = (data >> 6);
     //flip one switch is mode is = 0
@@ -172,27 +171,7 @@ void startupTest() {
 void randomFlipTest() {
   flipSwitch(random(0, 4), random(0, 8));
 }
-//send random messages to salvebots to test iic
-void testiic() {
-  for (uint8_t i = 1; i < 6; i++) {
-    for (uint8_t t = 0; t < 255; t++) {
-      sendI2C(i, t);
-      delay(20);
-    }
-  }
-}
-//test a specific slavebot
-void testBot(int botNum, int time) {
-  for (int i = 0; i < 255; i++) {
-    sendI2C(botNum, i);
-    delay(time);
-  }
-}
-//test a specific switch on a slavebot
-void testSwitch(int botNum, int switchNum) {
-  sendI2C(botNum, switchNum);
-}
-//
+
 //////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 //                               Main Loop
 //////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
