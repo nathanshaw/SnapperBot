@@ -198,7 +198,6 @@ void testSwitch(int botNum, int switchNum) {
 //////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 //
 void setup() {
-
   Serial.begin(9600);
   //open i2c port
   Wire.begin();//no address given, which designates this bot as master device on iic bus
@@ -225,5 +224,18 @@ void setup() {
 
 //keep it clean baby!
 void loop() {
-  byteListener();
+  randomFlipTest();
+  delay(random(15,30));
+  sendI2C(random(1,6), random(0,255));
+  delay(random(15,30));
+  sendI2C(random(1,6), random(0,255));
+  delay(random(15,30));
+  sendI2C(random(1,6), random(0,255));
+  delay(random(15,30));
+  sendI2C(random(1,6), random(0,255));
+  delay(random(15,30));
+  sendI2C(random(1,6), random(0,255));
+  delay(random(15,30));
+  //startupTest();
+  //byteListener();
 }

@@ -43,7 +43,7 @@ uint8_t mode;
 //
 void setup() {
   //this means the address for the arduino is now 1, and it is a slave
-  Wire.begin(1);
+  Wire.begin(3);
   Wire.onReceive(triggerEvent);//when the arduino receives a message on its Serial port it will forward the data to the receiveEvent event function
   //set all pins as output pins
   for (int i = 0; i < 8; i++) {

@@ -2,7 +2,7 @@ import serial, time, random, array
 #imports for OSC
 import OSC, threading
 #Serial initalize
-snapperBot = serial.Serial('/dev/tty.usbmodem1a12331', 9600, timeout = 0.1)
+snapperBot = serial.Serial('/dev/tty.usbmodem1a1241', 9600, timeout = 0.1)
 
 time.sleep(6)
 
@@ -94,7 +94,7 @@ def test():
 #                    Mail Loop
 #-------------------------------------------------
 
-receive_address = '10.2.32.231', 40000
+receive_address = '127.0.0.1', 40000
 osc = OSC.OSCServer(receive_address)
 osc.addDefaultHandlers()
 osc.addMsgHandler("/switch", switch_handler) # adding our function
