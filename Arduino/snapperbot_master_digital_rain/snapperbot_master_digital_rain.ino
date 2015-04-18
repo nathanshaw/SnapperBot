@@ -224,18 +224,18 @@ void setup() {
 
 //keep it clean baby!
 void loop() {
-  //randomFlipTest();
-  //delay(random(15,30));
-  //sendI2C(random(1,6), random(0,255));
-  //delay(random(15,30));
-  //sendI2C(random(1,6), random(0,255));
-  //delay(random(15,30));
-  //sendI2C(random(1,6), random(0,255));
-  //delay(random(15,30));
-  //sendI2C(random(1,6), random(0,255));
-  //delay(random(15,30));
-  //sendI2C(random(1,6), random(0,255));
-  //delay(random(15,30));
+  randomFlipTest();
+  delay(random(15,30));
+  sendI2C(random(1,6), random(0,255));
+  delay(random(15,30));
+  sendI2C(random(1,6), random(0,255));
+  delay(random(15,30));
+  sendI2C(random(1,6), random(0,255));
+  delay(random(15,30));
+  sendI2C(random(1,6), random(0,255));
+  delay(random(15,30));
+  sendI2C(random(1,6), random(0,255));
+  delay(random(15,30));
   //startupTest();
-  byteListener();
+  //byteListener();
 }
