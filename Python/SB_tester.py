@@ -2,7 +2,7 @@ import serial, time, random, array
 #imports for OSC
 import OSC, threading
 #Serial initalize
-snapperBot = serial.Serial('/dev/tty.usbmodem1d11341', 9600, timeout = 0.1)
+snapperBot = serial.Serial('/dev/tty.usbmodem1a1231', 9600, timeout = 0.1)
 
 time.sleep(6)
 
@@ -70,15 +70,15 @@ def multiSwitch(botNum, bankNum, velocity):
 def test():
     while True:
         for i in range(0,90):
-            multiSwitch(0,0,random.randint(0,7))
-            multiSwitch(0,1,random.randint(0,7))
-            multiSwitch(0,2,random.randint(0,7))
-            time.sleep(0.037)
+            multiSwitch(random.randint(0,5),0,random.randint(0,7))
+            multiSwitch(random.randint(0,5),1,random.randint(0,7))
+            multiSwitch(random.randint(0,5),2,random.randint(0,7))
+            time.sleep(.037)
         for i in range(0,60):
-            singleSwitch(0,random.randint(0,3),random.randint(0,7))
+            singleSwitch(random.randint(0,5),random.randint(0,3),random.randint(0,7))
             time.sleep(.06125)
         for i in range(0,30):
-            multiSwitch(0,random.randint(0,3),random.randint(0,7))
+            multiSwitch(random.randint(0,5),random.randint(0,3),random.randint(0,7))
             time.sleep(0.125)
         for i in range(0,100):
             randomTest()
