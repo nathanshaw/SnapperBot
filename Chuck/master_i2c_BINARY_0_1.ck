@@ -8,7 +8,7 @@ for(int i; i < list.cap(); i++)
 }
 
 SerialIO cereal;
-cereal.open(2, SerialIO.B9600, SerialIO.BINARY);
+cereal.open(3, SerialIO.B9600, SerialIO.BINARY);
 
 //dev two is usually it
 int channel;
@@ -94,7 +94,7 @@ fun void flipSwitch(int arduino, int bank, int swit){
 fun void poundBank(int arduino, int bank, int switchNum){
     
     <<<"Pound Bank ", bank, " ", switchNum, " switches activated">>>;
-    
+   
     arduino => byte[1];
     //put mode into the 2 most significant bits (64 because mode is 1 always)
     64 => byte[2];
@@ -107,6 +107,7 @@ fun void poundBank(int arduino, int bank, int switchNum){
     <<<byte[0], byte[1], byte[2]>>>;
     0 => byte[2] => byte[1];
     255 => byte[0];
+    
 }
 
 fun void swipeBank(int arduino, int bank, float length){

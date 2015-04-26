@@ -104,7 +104,6 @@ void byteListener() {
   //if we have serial data in the buffer
   while (Serial.available()) {
     if (Serial.available()) {
-
       //read the first byte
       while(!Serial.available())
       {
@@ -112,10 +111,6 @@ void byteListener() {
       Serial.readBytes((char*)dataBytes, 3);
       //if it is equal to our flag value
       if (dataBytes[0] == 0xff) {
-        //Serial.print("Bot Num : ");
-        //Serial.print(dataBytes[1]);
-        //Serial.print("Data Byte : ");
-        //Serial.println(dataBytes[2]);
         parseSerial(dataBytes[1], dataBytes[2]);
       }
       else {
@@ -224,18 +219,5 @@ void setup() {
 
 //keep it clean baby!
 void loop() {
-  //randomFlipTest();
-  //delay(random(15,30));
-  //sendI2C(random(1,6), random(0,255));
-  //delay(random(15,30));
-  //sendI2C(random(1,6), random(0,255));
-  //delay(random(15,30));
-  //sendI2C(random(1,6), random(0,255));
-  //delay(random(15,30));
-  //sendI2C(random(1,6), random(0,255));
-  //delay(random(15,30));
-  //sendI2C(random(1,6), random(0,255));
-  //delay(random(15,30));
-  //startupTest();
   byteListener();
 }

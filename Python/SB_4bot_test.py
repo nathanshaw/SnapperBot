@@ -22,7 +22,7 @@ def printing_handler(addr, tags, stuff, source):
 def randomTest():
     flag = 255
     #get random numbers to send
-    randomBot = random.randint(0,0)
+    randomBot = random.randint(0,3)
     randomMsg = random.randint(0, 254)
     #convert them to chars
     botChar = chr(randomBot)
@@ -70,24 +70,24 @@ def multiSwitch(botNum, bankNum, velocity):
 def test():
     while True:
         for i in range(0,90):
-            multiSwitch(random.randint(0,6),0,random.randint(0,7))
-            multiSwitch(random.randint(0,6),1,random.randint(0,7))
-            multiSwitch(random.randint(0,6),2,random.randint(0,7))
+            multiSwitch(random.randint(0,3),0,random.randint(1,8))
+            multiSwitch(random.randint(0,3),1,random.randint(1,8))
+            multiSwitch(random.randint(0,3),2,random.randint(1,8))
             time.sleep(.037)
         for i in range(0,60):
-            singleSwitch(random.randint(0,6),random.randint(0,3),random.randint(0,7))
+            singleSwitch(random.randint(0,3),random.randint(0,2),random.randint(0,7))
             time.sleep(.06125)
         for i in range(0,30):
-            multiSwitch(random.randint(0,6),random.randint(0,3),random.randint(0,7))
+            multiSwitch(random.randint(0,3),random.randint(0,2),random.randint(0,7))
             time.sleep(0.125)
-        for i in range(0,100):
-            randomTest()
+        #for i in range(0,100):
+        #    randomTest()
         for i in range(0,1):
             for ii in range(0,254):
-                line = snapperBot.readline()
+                #line = snapperBot.readline()
                 #print("incomming line : ",line)
                 writeSerial(i, ii)
-                time.sleep(0.002)
+                time.sleep(0.01)
                 #print(i, ii)
 
 #-------------------------------------------------

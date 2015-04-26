@@ -22,11 +22,11 @@ while( true )
     xmit.start( "/switch" );
     <<<"----------------">>>;
     // add float arg
-    //Math.random2( 0, 5 ) => int temp => xmit.add;
-    0 => int temp => xmit.add;
+    Math.random2( 0, 5 ) => int temp => xmit.add;
+    //Math.random2(0,4) => int temp => xmit.add;
     
     <<< temp >>>;
-    Math.random2( 0, 2 ) => temp => xmit.add;
+    Math.random2( 0, 3 ) => temp => xmit.add;
     <<< temp >>>;
     Math.random2( 1, 8 ) => temp => xmit.add;
     <<< temp >>>;
@@ -34,5 +34,5 @@ while( true )
     xmit.send();
     <<<"----------------">>>;
     // advance time
-    0.5::second => now;
+    0.15::second => now;
 }

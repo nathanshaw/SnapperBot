@@ -3,11 +3,13 @@ import serial, time, random, array
 import OSC, threading
 #Serial initalize
 
-snapperBot = serial.Serial('/dev/tty.usbmodem1a1241', 9600, timeout = 0.1)
+snapperBot = serial.Serial('/dev/tty.usbmodem1d11111', 9600, timeout = 0.1)
 
 time.sleep(6)
 
 def switch_handler(addr, tags, stuff, source):
+    if(stuff[0] == 4):
+        multiBank(stuff[2])
     multiSwitch(stuff[0], stuff[1], stuff[2])
     #print(addr, stuff[0], stuff[1], stuff[2])
 
@@ -51,18 +53,17 @@ def writeSerial(botNum, messageByte):
 #           SnapperBot Command Functions
 #-------------------------------------------------
 
-def singleSwitch(botNum, bankNum, switchNum):
-    msgByte = (bankNum << 4)
-    msgByte = (switchNum << 1) | msgByte
-    writeSerial(botNum, msgByte)
-    #print("singleSwitch : ", botNum, ',', bankNum,',' , switchNum)
-
 def multiSwitch(botNum, bankNum, velocity):
     msgByte = (bankNum << 4) | 64
     msgByte = (velocity << 1) | msgByte
     writeSerial(botNum, msgByte)
     #time.sleep(50)
     print("multiSwitch : ", botNum, ',', bankNum,',' , velocity)
+
+def multiBank(velocity):
+    print("MultiBank : ", velocity)
+    for i in range (0,3):
+        multiSwitch(i,random.randint(0,3), velocity)
 
 #-------------------------------------------------
 #                    Test Loop
@@ -95,7 +96,7 @@ def test():
 #                    Mail Loop
 #-------------------------------------------------
 
-receive_address = '10.2.35.99', 40000
+receive_address = '10.2.34.255', 40000
 osc = OSC.OSCServer(receive_address)
 osc.addDefaultHandlers()
 osc.addMsgHandler("/switch", switch_handler) # adding our function
