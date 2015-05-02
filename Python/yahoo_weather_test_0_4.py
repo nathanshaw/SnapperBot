@@ -171,7 +171,11 @@ def aFewClouds(temp):
     functionbleh(0.00089*temp, 0.0004*temp, temp)
     functionbleh(0.00009*temp, 0.00008*temp, temp)
 
-
+def thunderstorm(temp):
+    functionbleh(0.000005*temp, 0.0001*temp, temp)
+    functionbleh(0.00089*temp, 0.0004*temp, temp)
+    functionbleh(0.000009*temp, 0.00008*temp, temp)
+    functionbleh(0.0009*temp, 0.0008*temp, temp)
 
 def fair(temp):
     nathanRain(temp*4);
@@ -230,7 +234,7 @@ suggested_pickup = 30
 dewpoint_f = 60
 location = 'location'
 wind_mpf = 23
-#wind_dir =
+wind_dir = 'west'
 wind_degrees = 280
 pressure_in = 'pressure_in'
 longitude = 240
@@ -309,6 +313,13 @@ while True:
                 clearSnappers()
                 aFewClouds(temp_f)
                 aFewClouds(temp_f)
+                clearSnappers()
+            elif weather == 'Thunderstorm':
+                print("ThunderStorm Match")
+                clearSnappers()
+                thunderstorm(temp_f*random.uniform(1,2))
+                thunderstorm(temp_f*random.uniform(.1,.7))
+                thunderstorm(temp_f*random.uniform(0.4,3))
                 clearSnappers()
             else :
                 clearSnappers()
