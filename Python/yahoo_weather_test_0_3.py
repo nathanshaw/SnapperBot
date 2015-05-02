@@ -23,7 +23,7 @@ ARRAY_NUM = 4
 #What is the number of bots you are using? (minus 1)
 SNAPPERBOT_NUM = 2
 #What port name is you arduino?
-snapperBot = serial.Serial('/dev/tty.usbmodem1d1121', 9600, timeout = 0.1)
+snapperBot = serial.Serial('/dev/tty.usbmodem1d11111', 9600, timeout = 0.1)
 #
 ##-------------------------------------------------
 ##           SnapperBot Command Functions
@@ -89,35 +89,37 @@ relative_humidity = 80
 while True:
     random_station_name = noaa_station_names[random.randint(0, len(noaa_station_names) - 1)]
     noaa_result = pywapi.get_weather_from_noaa(random_station_name)
-    if (len(noaa_result) > 30):
-        noaa_values = noaa_result.values()
+    #if (len(noaa_result) > 30):
+     if 'temp_f' in  noaa_result:
+
+        ##noaa_values = noaa_result.values()
         #print(type(noaa_result))
         #print(noaa_result.values())
         #print(noaa_result.keys())
         ##Temp
         temp_f = noaa_result['temp_f']
         ##overcast, sunny, etc
-        weather = noaa_result['weather']
+        ##weather = noaa_result['weather']
         #windchill_f = noaa_result['windchill_f']
         ##not sure what these are but they vary from station to station
         #sugested_pickup_period = noaa_result['sugested_pickup_period']
         #suggested_pickup = noaa_result['sugested_pickup']
         ##dewpoint
-        dewpoint_f = noaa_result['dewpoint_f']
+        ##dewpoint_f = noaa_result['dewpoint_f']
         ##string of the name and state or terratory
-        location = noaa_result['location']
+        ##location = noaa_result['location']
         ##wind stuff
         #wind_mpf = noaa_result['wind_mpf']
-        wind_dir = noaa_result['wind_dir']
-        wind_degrees = noaa_result['wind_degrees']
+        ##wind_dir = noaa_result['wind_dir']
+        ##wind_degrees = noaa_result['wind_degrees']
         ##pressure
-        pressure_in = noaa_result['pressure_in']
+        ##pressure_in = noaa_result['pressure_in']
         ##location
-        location = noaa_result['location']
-        longitude = noaa_result['longitude']
-        latitude = noaa_result['latitude']
+        ###location = noaa_result['location']
+        ###longitude = noaa_result['longitude']
+        ###latitude = noaa_result['latitude']
         ##humidity
-        relative_humidity = noaa_result['relative_humidity']
+        ###relative_humidity = noaa_result['relative_humidity']
         print(noaa_values)
         print(len(noaa_values))
         sayNOAA()

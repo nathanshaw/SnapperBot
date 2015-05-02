@@ -6,30 +6,45 @@ nathan villicana-shaw
 revision: 001
 
 
-from host to the master snapperbot:
+.... ....  .... ....  .... ....
+  byte 0     byte 1    byte 2
 
+to device :
 
 //flip one specific switch
 message id:		(0) single_switch
 bytes:			2
 format:		1.ii .sss  0.bb rrrr
-				i (message id) = 0
-				s (snapperbot number) = 0 - 5
-				b (bank number) = 0 - 3
-				r (relay switch number) = 0-7
-ecode:		???
+			i (message id) = 0
+			s (snapperbot number) = 0 - 5
+			b (bank number) = 0 - 3
+			r (relay switch number) = 0-7
+
+encode		byte 0 : 0x80 | s
+		byte 1 : (b << 4) | r
+
+decode		id match : byte 0 & 0x30 == 1
+		s : byte 0 & 0x7
+		b : byte 1 & 0x30
+		r : byte 1 & 0xF
 
 
 //flip more than one switch on one bank
 message id:		(1) multi_switch
 bytes:			2
 format:		1.ii .sss  0.bb rrrr
-				i (message id) = 1
-				s (snapperbot number) = 0 - 5
-				b (bank number) = 0 - 3
-				r (number of switches) = 0-7
-ecode:		???
+			i (message id) = 1
+			s (snapperbot number) = 0 - 5
+			b (bank number) = 0 - 3
+			r (number of switches) = 0-7
+encode:		byte 0 : 0x90 | s
+		byte 1 : (b << 4) | r
 
+decode		id match : byte 0 & 0x30 == 2
+		s : byte 0 & 0x7
+		b : byte 1 & 0x30
+		r : byte 1 & 0xF
+		
 
 //flip switches on more than one bank
 message id:		(2) multi_bank
@@ -39,16 +54,37 @@ format:		1.ii .sss  0.bb rrrr
 				s (snapperbot number) = 0 - 5
 				b (number of banks) = 0 - 3
 				r (number of switches) = 0-7
-ecode:		???
+encode:		byte 0 : 0xA0 | s
+		byte 1 : (b << 4) | r
 
+decode		id match : byte 0 & 0x30 == 2
+		s : byte 0 & 0x7
+		b : byte 1 & 0x30
+		r : byte 1 & 0xF
 
 //flip switches one more than one bot
-message id:		(1) multi_bot
+message id:		(3) multi_bot
 bytes:			3
-format:		1.ii ....  0.ss ssss 0.bb rrrr
+format:		1.ii ....  0.ss ssss 0.aa rrrr
 				i (message id) = 3
 				s (slave send boolean) = LSB is the 5th slave
 				a (number of banks) = 0-3
 				r (number of switches) = 0-7
-ecode:		???
+encode:		byte 0 : 0xB0
+		byte 1 : 0 << s6 << s5 << s4 << s3 << s2 << s1
+		byte 2 : (a << 4) | r
+
+decode		id match : byte 0 & 0x30 == 2
+		s : byte 1 & 0x3F
+		a : byte 2 & 0x30
+		r : byte 2 & 0xF
+
+from device to slave devices:
+
+message id: (1) packI2C
+
+
+
+
+
 

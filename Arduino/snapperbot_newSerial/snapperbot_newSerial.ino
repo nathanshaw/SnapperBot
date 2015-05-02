@@ -34,10 +34,11 @@ uint8_t botNum;
 //                              i2c functions
 //////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 //
-void sendI2C(uint8_t _botNum, uint8_t _dataByte) {
+void sendI2C(uint8_t _botNum, uitn8_t _msgType, uint8_t _dataByte) {
   //start i2c message to slavebot _botNum
   Wire.beginTransmission(_botNum);
   //write byte to slavebot
+  Wire.write(_msgType);
   Wire.write(_dataByte);
   //close i2c message, if we wanted to send more info we would add another Wire.write
   Wire.endTransmission();
@@ -69,106 +70,91 @@ void setPorts(uint8_t which) {
 }
 //
 void flipSwitch(uint8_t array, uint8_t swit) {
-  //create a byte that we use as a bitmask
   uint8_t mask;
-  //create a mask of all 0's except for the location of the bit we want to change
   mask = 1 << (swit - 1);
-  //we xor the current array of values to change just the byte in question
   snapperStates[array] = snapperStates[array] ^ mask;
-  //lastly we write to our given port
   setPorts(array);
 }
 //
-void veryLoud(uint8_t level) {
-  //for each array of snapperbots
-  for (int i = 0; i < 4; i++) {
-    //change the snapper states to the proper level
+void veryLoud(uint8_t bankNum, uint8_t level) {
+  for (int i = 0; i < bankNum; i++) {
     snapperStates[i] ^= (255 >> (8 - level));
+    setPorts(i);
   }
-  //write to all the ports at once
-  setPorts(4);
 }
 //
 void loud(uint8_t snapArray, uint8_t level) {
-  //change the states of the appropiate snappers
   snapperStates[snapArray] ^= (255 >> (8 - level));
-  //write to all the ports
-  setPorts(4);
-}
-
-void allOff() {
-  for (int i = 0; i < 4; i++) {
-    snapperStates[i] = 0xff;
-  }
-  setPorts(4);
-  for(int i = 1; i < 6; i++) {
-   sendI2C(i, 0xff); 
-  }
+  setPorts(snapArray);
 }
 //
 //////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 //                              Serial Stuff
 //////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 //
+byte tempByte, msgID, botNum, arrayNum, switNum;
+
 void byteListener() {
-  //if we have serial data in the buffer
   while (Serial.available()) {
     if (Serial.available()) {
-      //read the first byte
-      while (!Serial.available())
-      {
-      };
-      Serial.readBytes((char*)dataBytes, 3);
-      //if it is equal to our flag value
-      if (dataBytes[0] == 0xff) {
-        //Serial.print("Bot Num : ");
-        //Serial.print(dataBytes[1]);
-        //Serial.print("Data Byte : ");
-        //Serial.println(dataBytes[2]);
-        parseSerial(dataBytes[1], dataBytes[2]);
-      }
-      else {
-        Serial.flush();
-      }
-    }
-  }
-}
-//
-void parseSerial(byte botNum, byte data) {
-  //the masterbot is bot 0
-  if (botNum == 255 && data == 255) {
-    allOff();
-  }
-  if (botNum == 0) {
-    //the mode is the 2 most significant bits
-    //shift those bits over 6 spaces and we have the mode
-    mode = (data >> 6);
-    //flip one switch is mode is = 0
-    if (mode == 0) {
-      //apply bitmasks and shift over the bits we are interested in and pass them into flipSwitch
-      flipSwitch((data & 0x30) >> 4, (1 >> (data & 0x0C)));
-    }
-    else if (mode == 1) {
-      //apply bitmasks and shift over the bits we are interested in and pass them into loud
-      loud((data & 0x30) >> 4, (data & 0x0E) >> 1);
-    }
-    else if (mode == 2) {
-      //apply bitmasks and shift over the bits we are interested in and pass them into veryLoud
-      veryLoud(data & 0x38 >> 3);
-    }
-  }
-  //if message is for a slaveBot pass it on to the corrisponding slave
-  else {
-    sendI2C(botNum, data);
-  }
-}
+      while (!Serial.available()) {};
+      byte tempByte = Serial.read();
+      //if we have a flag bit
+      if (tempByte & 0x80 == 0x80) {
+        botNum = tempByte & 0x7;
+        switch (tempByte & 0x30) {
+          case 0:
+            if (botNum == 0) {
+              tempByte = Serial.read();
+              arrayNum = tempByte & 0x30;
+              switNum = tempByte & 0xF;
+              flipSwitch(arrayNum, switNum);
+            }
+            else {
+              tempByte = Serial.read();
+              sendI2C(botNum, 0, tempByte);
+            }
+            break;
 
+          case 1:
+            if (botNum == 0) {
+              tempByte = Serial.read();
+              arrayNum = tempByte & 0x30;
+              switNum = tempByte 7 0xF;
+
+              loud(arrayNum, switchNum);
+            }
+            else {
+              tempByte = Serial.read();
+              sendI2C(botNum, 1, tempByte);
+            }
+            break;
+
+          case 2:
+            if (botNum == 0) {
+              tempByte = Serial.read();
+              arrayNum = tempByte & 0x30;
+              switNum = tempByte & 0xF;
+              veryLoud(arrayNum, switNum);
+            }
+            else {
+              tempByte = Serial.read();
+              sendI2C(botNum, 2, tempByte);
+            }
+            break;
+
+          case 3:
+            break;
+        }
+      }
+    }
+  }
+}
 //
 //////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 //                             Test Loops
 //////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 //
-
 //flip a random switch on a random array
 void randomFlipTest() {
   flipSwitch(random(0, 4), random(0, 8));
@@ -212,7 +198,7 @@ void testSwitch(int botNum, int switchNum) {
 //////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 //
 void setup() {
-  Serial.begin(57600);
+  Serial.begin(9600);
   //open i2c port
   Wire.begin();//no address given, which designates this bot as master device on iic bus
   //set all pins as output pins
@@ -231,17 +217,12 @@ void setup() {
   startupTest();
 }
 //
-//////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+//////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 //                               Main Loop
-//////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+//////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 //
-unsigned long time = millis();
-unsigned long offInter = 10000;
-//
+
+//keep it clean baby!
 void loop() {
-  if (time + offInter < millis()) {
-    allOff();
-    time = millis();
-  }
   byteListener();
 }

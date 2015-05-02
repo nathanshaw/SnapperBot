@@ -30,14 +30,20 @@ uint8_t snapperStates[4];//the states of the snappers
 uint8_t incommingByte;
 //for parsing serial
 uint8_t mode;
+
 //
+//////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+//                              i2c functions
+//////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+//
+
 //////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 //                             Setup Loop
 //////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 //
 void setup() {
   //this means the address for the arduino is now 1, and it is a slave
-  Wire.begin(5);
+  Wire.begin(4);
   Wire.onReceive(triggerEvent);//when the arduino receives a message on its Serial port it will forward the data to the receiveEvent event function
   //set all pins as output pins
   for (int i = 0; i < 8; i++) {
@@ -79,41 +85,29 @@ void setPorts(uint8_t which) {
   }
 }
 
+void allOff(){
+ for(int i; i < 4; i++){
+  snapperStates[i] = 0xFF;
+ } 
+}
+
 void flipSwitch(uint8_t array, uint8_t swit) {
-  //create a byte that we use as a bitmask
   uint8_t mask;
-  //create a mask of all 0's except for the location of the bit we want to change
   mask = 1 << (swit - 1);
-  //we xor the current array of values to change just the byte in question
   snapperStates[array] = snapperStates[array] ^ mask;
-  //lastly we write to our given port
   setPorts(array);
 }
 //
-void veryLoud(uint8_t level) {
-  //for each array of snapperbots
-  uint8_t mask;
-  mask = 255 >> (8 - level);
-  for (int i = 0; i < 4; i++) {
-    //change the snapper states to the proper level
-    snapperStates[i] ^= mask;
+void veryLoud(uint8_t bankNum, uint8_t level) {
+  for (int i = 0; i < bankNum; i++) {
+    snapperStates[i] ^= (255 >> (8 - level));
+    setPorts(i);
   }
-  //write to all the ports at once
-  setPorts(4);
 }
 //
 void loud(uint8_t snapArray, uint8_t level) {
-  //change the states of the appropiate snappers
   snapperStates[snapArray] ^= (255 >> (8 - level));
-  //write to all the ports
-  setPorts(4);
-}
-
-void allOff() {
-  for (int i = 0; i < 4; i++) {
-    snapperStates[i] = 0xff;
-  }
-  setPorts(4);
+  setPorts(snapArray);
 }
 //
 //////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -126,53 +120,28 @@ void triggerEvent(int port) {
     //and as long as we have bytes to be read
     while (Wire.available()) {
       //parse out the data one byte at a time
-      parseI2C(Wire.read());
+      parseI2C(Wire.read(), Wire.read());
     }
   }
 }
 //
-void parseI2C(uint8_t data) {
-    //shift those bits over 6 spaces and we have the mode
-    mode = (data >> 6);
+void parseI2C(uint8_t mode, uint8_t data) {
     //flip one switch is mode is = 0
-    if (mode == 0) {
+    if (mode == 1) {
       //apply bitmasks and shift over the bits we are interested in and pass them into flipSwitch
-      flipSwitch((data & 0x30) >> 4, (1 >> (data & 0x0C)));
-    }
-    else if (mode == 1) {
-      //apply bitmasks and shift over the bits we are interested in and pass them into loud
-      loud((data & 0x30) >> 4, (data & 0x0E) >> 1);
+      flipSwitch((data & 0x30) >> 4,  (data & 0xF));
     }
     else if (mode == 2) {
-      //apply bitmasks and shift over the bits we are interested in and pass them into veryLoud
-      veryLoud(data & 0x38 >> 3);
+      //apply bitmasks and shift over the bits we are interested in and pass them into loud
+      loud((data & 0x30) >> 4, data & 0xF);
     }
     else if (mode == 3) {
-      allOff(); 
+      //apply bitmasks and shift over the bits we are interested in and pass them into veryLoud
+      veryLoud((data & 0x30) >> 4, data & 0xF);
     }
-}
-
-//////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-//                             Test Loops
-//////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-//
-
-//to make sure all relays are working
-void startupTest() {
-  for (int t = 1; t < 9; t++) {
-    for (int i = 0; i < 4; i++) {
-      loud(i, t);
-      delay(30);
+    else if (mode == 4){
+     allOff(); 
     }
-  }
-  for (int i = 1; i < 9; i++) {
-    veryLoud(i);
-    delay(62);
-  }
-}
-//flip a random switch on a random array
-void randomFlipTest() {
-  flipSwitch(random(0, 4), random(0, 8));
 }
 
 //////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -182,5 +151,4 @@ void randomFlipTest() {
 
 //everything is evert driven so no need for anything in the loop
 void loop() {
-  
 }
