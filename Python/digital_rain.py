@@ -1,0 +1,536 @@
+###################################################
+# Code for controling the SnapperBot System using
+# the Yahoo Weather API
+#
+# Coded for the Installation "Digital Rain"
+#
+# By Nathan Villicana-Shaw
+# CalArts MTIID
+#
+###################################################
+import pywapi
+import string
+from os import system
+import serial, time
+import random
+from threading import Thread
+
+#################################################
+#            Variables to Change
+#################################################
+
+#are three or four arrays attached to each SnapperBot
+ARRAY_NUM = 4
+#What is the number of bots you are using? (minus 1)
+SNAPPERBOT_NUM = 5
+#What port name is you arduino?
+snapperBot = serial.Serial('/dev/tty.usbmodem1d11411', 57600, timeout = 0.1)
+#
+##-------------------------------------------------
+##           SnapperBot Command Functions
+##-------------------------------------------------
+#
+time.sleep(6)
+#
+def writeSerial(botNum, messageByte):
+    flag = chr(255)
+    botChar = chr(botNum)
+    msgChar = chr(messageByte)
+    msgString = (flag, botChar, msgChar)
+    snapperBot.write(msgString)
+    #print(msgString)
+
+def clearSnappers():
+        msgString = (0xff,0xff,0xff)
+        snapperBot.write(msgString)
+
+def singleSwitch(botNum, bankNum, switchNum):
+    msgByte = (bankNum << 4)
+    msgByte = (switchNum << 1) | msgByte
+    writeSerial(botNum, msgByte)
+    #print("singleSwitch : ", botNum, ',', bankNum,',' , switchNum)
+
+def multiSwitch(botNum, bankNum, velocity):
+    msgByte = (bankNum << 4) | 64
+    msgByte = (velocity << 1) | msgByte
+    writeSerial(botNum, msgByte)
+    #print("multiSwitch : ", botNum, bankNum , velocity)
+
+def arraySwipe(data, delay):
+    for i in range (int(data)):
+        singleSwitch(i%6, i%4, i%8)
+        time.sleep(delay)
+
+def arrayBlast(data, _time):
+    for i in range (data):
+        multiSwitch(i%6, i%4, i%8)
+        time.sleep(_time)
+
+def rain(botNum,bankNum,switchNum):
+    while True:
+        singleSwitch(botNum,bankNum,switchNum);
+        rand1 = random.uniform(.0005,0.004)
+        time.sleep(rand1);
+
+def nathanRain(speed, wind, chance, range1):
+    for i in range (range1):
+        factor = chance * random.uniform(0,1)
+        if factor > 0.5:
+            multiSwitch(random.randint(0,5), random.randint(0,3), random.randint(0,7))
+        else :
+            singleSwitch(random.randint(0,5), random.randint(0,3), random.randint(0,7))
+        time.sleep(speed/random.uniform(150*wind,300*wind))
+
+def testRain():
+    for i in range(0,1000):
+        rand0 = random.randint(0,6)
+        rand1 = random.uniform(.01,.2)
+        rand2 = random.randint(0,5)
+        rand3 = random.randint(0,3)
+        rand4 = random.randint(0,7)
+        if rand0 < 5 :
+            singleSwitch(rand2,rand3,rand4)
+            time.sleep(rand1)
+        else:
+            multiSwitch(rand2,rand3,rand4)
+
+#def arrayBlast1(data):
+#   for i in range (data):
+#      multiSwitch(0, i%4, 7)
+#     multiSwitch(1, i%4, 7)
+#    time.sleep(.15)
+
+def nathanBeat(number1, number2, temp):
+    for i in range(int(temp)):
+
+        multiSwitch(0,i%4,i%8)
+        multiSwitch(1,i%4,i%8)
+        multiSwitch(3,i%4,i%8)
+        multiSwitch(4,i%4,i%8)
+        multiSwitch(5,i%4,i%8)
+        time.sleep(number1)
+        multiSwitch(1,i%4,i%8)
+        multiSwitch(2,i%4,i%8)
+        multiSwitch(3,i%4,i%8)
+        multiSwitch(4,i%4,i%8)
+        multiSwitch(5,i%4,i%8)
+        time.sleep(number2/2)
+        multiSwitch(1,i%4,i%8)
+        multiSwitch(2,i%4,i%8)
+        multiSwitch(3,i%4,i%8)
+        multiSwitch(4,i%4,i%8)
+        multiSwitch(5,i%4,i%8)
+        time.sleep(number1/2)
+        multiSwitch(0,i%4,i%8)
+        multiSwitch(1,i%4,i%8)
+        multiSwitch(2,i%4,i%8)
+        multiSwitch(3,i%4,i%8)
+        time.sleep(number2*2)
+
+
+def nathanAllFreak(number1, number2, number3, _time):
+    for i in range(int(number1)):
+        nathanBankFreak(number2,number3,random.randint(0,5))
+        time.sleep(_time)
+
+def nathanBankFreak(number1,number2, arduino):
+    for i in range (number1):
+        for ii in range (number2):
+            singleSwitch(arduino,ii%4,ii%8)
+            time.sleep(0.00001)
+
+def bankSweep(number, time1): #cool one
+    for i in range (number):
+        multiSwitch(0,0,i%8)
+        multiSwitch(0,1,i%8)
+        multiSwitch(0,2,i%8)
+        multiSwitch(0,3,i%8)
+        multiSwitch(1,0,i%8)
+        multiSwitch(1,1,i%8)
+        multiSwitch(1,2,i%8)
+        multiSwitch(1,3,i%8)
+        multiSwitch(2,0,i%8)
+        multiSwitch(2,1,i%8)
+        multiSwitch(2,2,i%8)
+        multiSwitch(2,3,i%8)
+        multiSwitch(3,0,i%8)
+        multiSwitch(3,1,i%8)
+        multiSwitch(3,2,i%8)
+        multiSwitch(3,3,i%8)
+        multiSwitch(4,0,i%8)
+        multiSwitch(4,1,i%8)
+        multiSwitch(4,2,i%8)
+        multiSwitch(4,3,i%8)
+        multiSwitch(5,0,i%8)
+        multiSwitch(5,1,i%8)
+        multiSwitch(5,2,i%8)
+        multiSwitch(5,3,i%8)
+        time.sleep(time1)
+
+def functionbleh1(time1, time2, data):
+    for i in range (int(data)):
+        multiSwitch(0,i%4,i%8)
+        multiSwitch(1,i%4,i%8)
+        multiSwitch(3,i%4,i%8)
+        multiSwitch(4,i%4,i%8)
+        multiSwitch(2,i%4,i%8)
+        time.sleep((time1+time2)*0.34)
+        multiSwitch(5,i%4,i%8)
+        multiSwitch(3,i%4,i%8)
+        multiSwitch(1,i%4,i%8)
+        multiSwitch(4,i%4,i%8)
+        time.sleep(time2*0.77)
+        multiSwitch(5,i%4,i%8)
+        multiSwitch(3,i%4,i%8)
+        multiSwitch(2,i%4,i%8)
+        multiSwitch(1,i%4,i%8)
+        multiSwitch(4,i%4,i%8)
+        time.sleep(time2*0.77)
+
+
+
+def functionbleh(time1, time2, data):
+    for i in range (int(data)):
+        multiSwitch(0,i%4,i%8)
+        multiSwitch(1,i%4,i%8)
+        multiSwitch(2,i%4,i%8)
+        multiSwitch(3,i%4,i%8)
+        multiSwitch(4,i%4,i%8)
+        multiSwitch(5,i%4,i%8)
+        time.sleep(time1)
+        multiSwitch(0,i%4,i%8)
+        multiSwitch(1,i%4,i%8)
+        multiSwitch(2,i%4,i%8)
+        multiSwitch(3,i%4,i%8)
+        multiSwitch(4,i%4,i%8)
+        multiSwitch(5,i%4,i%8)
+        time.sleep(time2)
+
+def sunny(temp):
+    for i in range(temp):
+        nathanRain(temp*random.randint(0.2,0.5))
+
+def partlyCloudy(temp, wind):
+    for i in range(40, int(44 + wind)):
+        print(i)
+        nathanBeat(i*temp*0.00002,wind*(200-i)*0.000003, 20 + int(temp*0.35))
+        if i % 6 == 2:
+            time.sleep(wind*0.07)
+        time.sleep(wind*0.004)
+
+def overcast(temp_f, wind_s):
+    wind_s = float(wind_s)
+    temp_f = float(temp_f)
+    for i in range (30,70):
+        if i%int(wind_s) == 0:
+            time.sleep(random.uniform(0.0075,0.02)*float(wind_s))
+        if i%int(wind_s) == 13:
+            time.sleep(random.uniform(0.0095,0.03)*float(wind_s))
+        functionbleh(.00001*float(wind_s*5),.0000015*temp_f,int(i*.30))
+        functionbleh(.000009*float(wind_s*5),.0000012*temp_f,int(i*0.35))
+        if i%int(wind_s) == 16:
+            time.sleep(random.uniform(0.0075,0.02)*float(wind_s))
+        functionbleh(.000009*float(wind_s*5),.0000075*temp_f,int(i*0.1))
+        functionbleh(.000008*float(wind_s*5),.0000155*temp_f,random.randint(1,5))
+        time.sleep(random.uniform(0.005,0.005)*float(wind_s))
+        functionbleh(.000007*float(wind_s*5),.0000015*temp_f,int(0.1*i))
+        if i%int(wind_s) == 7:
+            time.sleep(random.uniform(0.0075,0.02)*float(wind_s))
+        functionbleh(.000006*float(wind_s*5),.0000125*float(temp_f),int(0.12*i))
+
+def mostlyCloudy(temp, wind):
+    wind = float(wind)
+    for i in range(0,100):
+        if (i%int(wind) == 0):
+            for i in range(0,int(wind*0.25)):
+                arraySwipe(temp*random.uniform(1,4), random.uniform(0.0000009, 0.0000012)*temp)
+                time.sleep(temp/random.randint(70,200))
+        else:
+                functionbleh(random.uniform(0.00000006, 0.0000002)*temp, random.uniform(0.00000004, 0.00002)*temp, int(temp/2))
+    time.sleep(6)
+
+def aFewClouds(temp, wind):
+    wind = float(wind)
+    wind = 2.5 + wind
+    if temp < 20:
+        temp = 19
+    functionbleh(0.0015*wind, 0.0001*temp, 10)
+    nathanAllFreak(int(temp/12),int(temp/20),50,random.uniform(0.001,0.003))
+    functionbleh1(0.0024*wind, 0.0004*temp, int(temp*0.6))
+    functionbleh1(0.0053*wind, 0.00008*temp, int(temp*0.6))
+    nathanAllFreak(int(temp/7),int(temp/15),50,random.uniform(0.0006,0.002))
+    time.sleep((50 - wind)*0.005)
+    functionbleh1(0.00035*temp, 0.00005*wind, int(wind*1.5))
+    functionbleh1(0.0034*wind, 0.0001*wind, int((wind+temp)/2))
+    nathanAllFreak(int(temp/17),int(temp/24),50,random.uniform(0.0001,0.001))
+    time.sleep((50 - wind)*0.005)
+    functionbleh(0.00033*temp, 0.00008*temp, wind*2)
+
+def fair(temp, wind):
+    if temp < 20:
+        temp = 20
+    wind = float(wind)
+    nathanBeat(0.00149*temp, 0.00011*(wind*5), int(temp*0.4))
+    nathanRain(temp, wind, 0.4,  int(wind*2))
+    functionbleh(0.00129*temp, 0.00010*temp, temp*2)
+    nathanBeat(0.00119*temp, 0.00001*(wind*5), int(temp*0.6))
+    nathanRain(temp, wind, 0.4,  int(wind*2))
+    nathanRain(temp, wind, 0.4,  int(wind*2))
+    functionbleh(0.00119*temp, 0.00001*temp, int(temp))
+    nathanBeat(0.0016*temp, 0.00004*(wind*5), int(temp*0.2))
+    nathanRain(temp, wind, 0.4,  int(wind*2))
+    nathanBeat(0.00129*temp, 0.00010*(wind*5), int(temp*.7))
+    nathanRain(temp, wind, 0.4,  int(wind*2))
+    functionbleh(0.00149*temp, 0.00011*temp, int(temp*0.6))
+    nathanRain(temp, wind, 0.4,  int(wind*2))
+    functionbleh(0.0016*temp, 0.00004*temp, int(temp*0.6))
+    nathanRain(temp, wind, 0.4,  int(wind*2))
+    functionbleh(0.00009*temp, 0.00008*temp, temp)
+
+def clear(temp, windSpeed):
+    nathanRain(temp*3, windSpeed*10, random.uniform(0.2,0.8), int(temp));
+    nathanRain(temp*4, windSpeed*8, random.uniform(0.2,0.8), int(windSpeed * 7));
+    nathanRain(temp*3.2, windSpeed*10, random.uniform(0.2,0.8), int(temp + windSpeed));
+    nathanRain(temp*4, windSpeed*7, random.uniform(0.2,0.8), int(windSpeed * 6));
+
+def thunderstorm(temp):
+
+    functionbleh(.00002*temp,.002,10)
+    functionbleh(.00001*temp,.001,10)
+    functionbleh(.000015*temp,.0015,10)
+    functionbleh(.000015*temp,.0013,20)
+    functionbleh(.00015*temp,.001,10)
+    functionbleh(.000018*temp,.001,30)
+    functionbleh(.00002*temp,.0011,50)
+    functionbleh(.000024*temp,.0015,100)
+    functionbleh(.00003*temp,.002,10)
+    functionbleh(.00001*temp,.002,10)
+    functionbleh(.00009*temp,.005,70)
+    functionbleh(.00001*temp,.002,50)
+    functionbleh(.00016*temp,.0014,100)
+    functionbleh(.00002*temp,.0011,10)
+    functionbleh(.00019*temp,.0017,30)
+    functionbleh(.00002*temp,.0011,10)
+    functionbleh(.000028*temp,.0015,10)
+    functionbleh(.00006*temp,.008,100)
+    functionbleh(.00004*temp,.006,75)
+    functionbleh(.000009*temp,.0055,10)
+    functionbleh(.000008*temp,.0055,10)
+    functionbleh(.000007*temp,.0055,10)
+    functionbleh(.000006*temp,.0055,10)
+
+#-------------------------------------------------
+#              Weather API Stuff
+#-------------------------------------------------
+
+noaa_station_names = ['VWS', 'PFAL', 'KJFK', 'PAMR', 'KEET', 'ASPA', 'TT127', 'MABL', 'MACR', 'CCSL', 'KAJO', 'KPSP', 'RFN', 'KRCV', 'SA00', 'SV', 'TO', 'BBY4', 'KAJO','KSNC', 'KIJL', 'AN120', 'D1189', 'NA2', 'BRTW',  'BALM', 'PGUM', '52200', 'PHHN', 'AR427', 'KFEP', 'SG04', 'KCBK','KFSK', 'LSUA', 'KAUD', 'k01T', '1LSU', 'KCHI', 'PHII', 'KOK1', 'K8A0', 'KHKA', 'KBYH', 'KCMD', 'KVOA', 'K4C0', 'KQT8', 'KQT9','KP92', 'EPO', 'BARH', 'BRU5', 'KBXM', 'UNIV', 'SOWR', 'SUP1', 'LANS','K96D','KBAC','NSTU','PPG01', 'TT126', '51181', 'LATP6', 'NSTP6', 'MTCP7','WWHP7', 'PWAK', 'DDDP7', 'C6666', 'KLBL', 'KIAB', 'KAAO', 'MAOP4', 'SLMP4', 'YAHP4','KBHX', 'K064', 'KMHV', 'KMHS','BLDN8', 'AFRP4', 'MOCP4', 'YABP4', 'LTBV3', 'D8627', '41051', '91S', 'KZSE', 'K91S', 'CHAW', 'KCLS', 'AGKO', 'BATO', 'BANO', 'BEWO', 'K1B5', 'KOLD', 'K96B','MRSNV']
+print("|||||||||||||||||||||||||||||||||||||||||||||||||")
+print(noaa_station_names)
+print("|||||||||||||||||||||||||||||||||||||||||||||||||")
+noaa_result = pywapi.get_weather_from_noaa('KJFK')
+
+
+#-------------------------------------------------
+#                 Say Functions
+#-------------------------------------------------
+def sayNOAA():
+    chance = random.randint(0,3)
+    if chance < 2:
+        system('say ' +  "It is " + str(weather) + " and " + str(temp_f) + " Fahrenheit  now in " + location  + " , ... And the wind blows " + str(wind_dir) + " At " + str(wind_speed) + " Miles Per Hour " + "&\n" )
+    elif chance == 3:
+        system('say ' +  "In  " + str(location) + " it is " + str(weather) +  " ,... And the wind blows at" + str(wind_speed) + " Miles Per Hour " + str(wind_dir) + "&\n" )
+    else :
+        system('say ' +  "It is " + str(temp_f) + " Fahrenheit and " + str(weather) + " now in " + str(location)  + " ... the wind blows " + str(wind_dir) + " At " + str(wind_speed) + " Miles an Hour " + "&\n" )
+
+#-------------------------------------------------
+#                   Main Loop
+#-------------------------------------------------
+
+temp_f = 70
+weather = 'sunny'
+windchill_f =  12
+sugested_pickup_period = 24
+suggested_pickup = 30
+dewpoint_f = 60
+location = 'location'
+wind_speed = 23
+wind_dir = 'west'
+wind_degrees = 280
+pressure_in = 'pressure_in'
+longitude = 240
+latitude = 300
+relative_humidity = 80
+
+while True:
+    random_station_name = noaa_station_names[random.randint(0, len(noaa_station_names) - 1)]
+    noaa_result = pywapi.get_weather_from_noaa(random_station_name)
+    noaa_values = noaa_result.values()
+    noaa_keys = noaa_result.keys()
+    if len(noaa_values) == 1:
+        if random.randint(0,10) < 7:
+            sayNOAA()
+        print("Did not Connect to NOAA : will try again...")
+        nathanAllFreak(random.randint(1,3),random.randint(1,3),random.randint(100,250),random.uniform(0.00006,0.001))
+        time.sleep(random.uniform(0.01,0.6))
+        nathanAllFreak(random.randint(1,3),random.randint(1,3),random.randint(100,250),random.uniform(0.00006,0.001))
+        time.sleep(random.uniform(0.01,0.6))
+        nathanAllFreak(random.randint(1,3),random.randint(1,3),random.randint(100,250),random.uniform(0.00006,0.001))
+        time.sleep(random.uniform(0.001,0.7))
+        nathanAllFreak(random.randint(1,3),random.randint(1,3),random.randint(100,250),random.uniform(0.00006,0.001))
+        time.sleep(random.uniform(0.01,0.6))
+
+
+    elif 'temp_f' and 'weather' and 'location' and 'wind_degrees' and 'wind_mpf' and 'wind_dir'  in  noaa_result:
+
+
+        location = noaa_result['location']
+        print("Location is          :", location)
+
+        if 'wind_mph' in noaa_result:
+            wind_speed = float(noaa_result['wind_mph'])
+            if wind_speed < 3:
+                wind_speed = 3
+            print("wind_mph             : ", wind_speed)
+            wind_dir = noaa_result['wind_dir']
+            #print("wind_dir : ", wind_dir)
+
+            if 'temp_f' in noaa_result:
+                temp_f = float(noaa_result['temp_f'])
+                if temp_f < 3:
+                    temp_f = 2
+                print("Temperature in F is  :", temp_f)
+
+            if 'weather' in noaa_result:
+
+                weather = noaa_result['weather']
+                print(weather)
+                time.sleep(5.1)
+                if random.randint(0,100) == 1:
+                    weather = 'Thunderstorm'
+                    print("|||||||||||||||||||||||||")
+                    print("VETO TO THUNDERSTORM")
+                    print("|||||||||||||||||||||||||")
+                #weather = 'Thunderstorm'
+                #weather = 'Overcast'
+                #weather = 'Mostly Cloudy'
+                #weather = 'Partly Cloudy'
+                #weather = 'A Few Clouds'
+                #weather = 'Fair'
+                #weather = 'Clear'
+                #weather = 'Car'
+
+                if weather == 'Mostly Cloudy':
+                    sayNOAA()
+                    time.sleep(1.5)
+                    if temp_f < 10:
+                        temp_f = 10
+                    print("Mostly Cloudy Match")
+                    print("------------------------------")
+                    mostlyCloudy(temp_f, wind_speed)
+                    mostlyCloudy(int(temp_f*0.7), wind_speed)
+                    time.sleep(3)
+                    clearSnappers()
+
+                elif weather[:13] == 'Partly Cloudy':
+                    sayNOAA()
+                    time.sleep(1.5)
+                    print("Partly Cloudy Match")
+                    print("------------------------------")
+                    clearSnappers()
+                    partlyCloudy(int(temp_f*1.55), wind_speed*0.5)
+                    clearSnappers()
+
+                elif weather == 'Clear':
+                    sayNOAA()
+                    time.sleep(1.5)
+                    print("Clear Match");
+                    print("------------------------------")
+                    clearSnappers()
+                    clear(temp_f*0.75, wind_speed)
+                    clear(temp_f, wind_speed)
+                    clear(temp_f*0.75, wind_speed)
+                    clearSnappers()
+
+                elif weather == 'Overcast' or weather == 'Fog/Mist' or weather == 'Fair with Haze':
+                    sayNOAA()
+                    time.sleep(1.5)
+                    print("Overcast Match")
+                    print("------------------------------")
+                    clearSnappers()
+                    overcast(temp_f*0.5, wind_speed)
+                    time.sleep(3)
+                    overcast(temp_f*0.25, wind_speed)
+                    time.sleep(3)
+                    overcast(temp_f*0.75, wind_speed*2)
+                    time.sleep(3)
+                    overcast(temp_f, wind_speed)
+                    time.sleep((temp_f*0.2) + (wind_speed*0.5) + 6)
+                    clearSnappers()
+
+                elif weather == 'Fair':
+                    if(temp_f < 14):
+                        temp_f = 14
+                    chance = random.randint(0,4)
+                    if(chance < 2):
+                        sayNOAA()
+                        time.sleep(1.5)
+                        clearSnappers()
+                        print("Fair Match")
+                        print("------------------------------")
+                        fair(temp_f, (wind_speed + 5))
+                        clearSnappers()
+                    elif (chance == 2):
+                        print("Fair Clear match")
+                        print("------------------------------")
+                        clear(temp_f*0.725, wind_speed*1.55)
+                        clear(temp_f*1.2, wind_speed*1.15)
+                        clear(temp_f*1.725, wind_speed*0.75)
+                    else:
+                        print("rejecting Fair : too common")
+                        print("------------------------------")
+
+                elif weather == 'A Few Clouds':
+                    sayNOAA()
+                    time.sleep(3)
+                    print("A Few Clouds Match")
+                    print("------------------------------")
+                    clearSnappers()
+                    aFewClouds(temp_f*0.5, wind_speed*1.5)
+                    aFewClouds(temp_f*2, wind_speed*0.5)
+                    clearSnappers()
+
+                elif weather == 'Thunderstorm':
+                    sayNOAA()
+                    time.sleep(3)
+                    print("ThunderStorm Match")
+                    print("------------------------------")
+                    clearSnappers()
+                    thunderstorm(temp_f*random.uniform(1,2))
+                    thunderstorm(temp_f*random.uniform(.1,.7))
+                    thunderstorm(temp_f*random.uniform(0.4,3))
+                    thunderstorm(temp_f*random.uniform(0.01,2.4))
+                    thunderstorm(temp_f*random.uniform(.1,.7))
+                    thunderstorm(temp_f*random.uniform(0.4,3))
+                    clearSnappers()
+                else :
+                    print("Printing the Values : ", noaa_values)
+                    print("No Match")
+                    print("No Match")
+                    print("No Match")
+                    print("No Match")
+                    sayNOAA()
+                    clearSnappers()
+                    thunderstorm(temp_f*random.uniform(0.1,2.4))
+                    thunderstorm(temp_f*random.uniform(.4,.17))
+                    thunderstorm(temp_f*random.uniform(0.2,1))
+                    clearSnappers()
+                    #noMatch(temp_f)
+
+            sayNOAA()
+            time.sleep(0.5)
+
+    else:
+        nathanAllFreak(4,4,150,random.uniform(0.00001,0.0003))
+        time.sleep(1)
+        nathanAllFreak(4,4,150,random.uniform(0.00001,0.0003))
+        nathanAllFreak(4,4,150,random.uniform(0.00001,0.0003))
