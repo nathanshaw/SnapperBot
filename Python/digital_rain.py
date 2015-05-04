@@ -4,7 +4,7 @@
 #
 # Coded for the Installation "Digital Rain"
 #
-# By Nathan Villicana-Shaw
+# By Nathan Villicana-Shaw with help from Jake Penn
 # CalArts MTIID
 #
 ###################################################
@@ -27,7 +27,7 @@ SNAPPERBOT_NUM = 5
 snapperBot = serial.Serial('/dev/tty.usbmodem1d11411', 57600, timeout = 0.1)
 #
 ##-------------------------------------------------
-##           SnapperBot Command Functions
+##           SnapperBot Command Functions (low Level)
 ##-------------------------------------------------
 #
 time.sleep(6)
@@ -38,23 +38,20 @@ def writeSerial(botNum, messageByte):
     msgChar = chr(messageByte)
     msgString = (flag, botChar, msgChar)
     snapperBot.write(msgString)
-    #print(msgString)
 
 def clearSnappers():
-        msgString = (0xff,0xff,0xff)
-        snapperBot.write(msgString)
+    msgString = (0xff,0xff,0xff)
+    snapperBot.write(msgString)
 
 def singleSwitch(botNum, bankNum, switchNum):
     msgByte = (bankNum << 4)
     msgByte = (switchNum << 1) | msgByte
     writeSerial(botNum, msgByte)
-    #print("singleSwitch : ", botNum, ',', bankNum,',' , switchNum)
 
 def multiSwitch(botNum, bankNum, velocity):
     msgByte = (bankNum << 4) | 64
     msgByte = (velocity << 1) | msgByte
     writeSerial(botNum, msgByte)
-    #print("multiSwitch : ", botNum, bankNum , velocity)
 
 def arraySwipe(data, delay):
     for i in range (int(data)):
@@ -65,6 +62,12 @@ def arrayBlast(data, _time):
     for i in range (data):
         multiSwitch(i%6, i%4, i%8)
         time.sleep(_time)
+
+#
+##-------------------------------------------------
+##           Musical Functions (mid Level)
+##-------------------------------------------------
+#
 
 def rain(botNum,bankNum,switchNum):
     while True:
@@ -93,12 +96,6 @@ def testRain():
             time.sleep(rand1)
         else:
             multiSwitch(rand2,rand3,rand4)
-
-#def arrayBlast1(data):
-#   for i in range (data):
-#      multiSwitch(0, i%4, 7)
-#     multiSwitch(1, i%4, 7)
-#    time.sleep(.15)
 
 def nathanBeat(number1, number2, temp):
     for i in range(int(temp)):
@@ -140,6 +137,7 @@ def nathanBankFreak(number1,number2, arduino):
             time.sleep(0.00001)
 
 def bankSweep(number, time1): #cool one
+
     for i in range (number):
         multiSwitch(0,0,i%8)
         multiSwitch(0,1,i%8)
@@ -168,6 +166,7 @@ def bankSweep(number, time1): #cool one
         time.sleep(time1)
 
 def functionbleh1(time1, time2, data):
+
     for i in range (int(data)):
         multiSwitch(0,i%4,i%8)
         multiSwitch(1,i%4,i%8)
@@ -187,9 +186,8 @@ def functionbleh1(time1, time2, data):
         multiSwitch(4,i%4,i%8)
         time.sleep(time2*0.77)
 
-
-
 def functionbleh(time1, time2, data):
+
     for i in range (int(data)):
         multiSwitch(0,i%4,i%8)
         multiSwitch(1,i%4,i%8)
@@ -205,46 +203,68 @@ def functionbleh(time1, time2, data):
         multiSwitch(4,i%4,i%8)
         multiSwitch(5,i%4,i%8)
         time.sleep(time2)
+#
+##-------------------------------------------------
+##        Weather Functions (high level)
+##-------------------------------------------------
+#
 
 def sunny(temp):
+
     for i in range(temp):
         nathanRain(temp*random.randint(0.2,0.5))
 
 def partlyCloudy(temp, wind):
+
     for i in range(40, int(44 + wind)):
         print(i)
         nathanBeat(i*temp*0.00002,wind*(200-i)*0.000003, 20 + int(temp*0.35))
+
         if i % 6 == 2:
             time.sleep(wind*0.07)
         time.sleep(wind*0.004)
 
 def overcast(temp_f, wind_s):
+
     wind_s = float(wind_s)
     temp_f = float(temp_f)
+
     for i in range (30,70):
+
         if i%int(wind_s) == 0:
             time.sleep(random.uniform(0.0075,0.02)*float(wind_s))
+
         if i%int(wind_s) == 13:
             time.sleep(random.uniform(0.0095,0.03)*float(wind_s))
+
         functionbleh(.00001*float(wind_s*5),.0000015*temp_f,int(i*.30))
         functionbleh(.000009*float(wind_s*5),.0000012*temp_f,int(i*0.35))
+
         if i%int(wind_s) == 16:
             time.sleep(random.uniform(0.0075,0.02)*float(wind_s))
+
         functionbleh(.000009*float(wind_s*5),.0000075*temp_f,int(i*0.1))
         functionbleh(.000008*float(wind_s*5),.0000155*temp_f,random.randint(1,5))
         time.sleep(random.uniform(0.005,0.005)*float(wind_s))
         functionbleh(.000007*float(wind_s*5),.0000015*temp_f,int(0.1*i))
+
         if i%int(wind_s) == 7:
             time.sleep(random.uniform(0.0075,0.02)*float(wind_s))
+
         functionbleh(.000006*float(wind_s*5),.0000125*float(temp_f),int(0.12*i))
 
 def mostlyCloudy(temp, wind):
+
     wind = float(wind)
+
     for i in range(0,100):
+
         if (i%int(wind) == 0):
+
             for i in range(0,int(wind*0.25)):
                 arraySwipe(temp*random.uniform(1,4), random.uniform(0.0000009, 0.0000012)*temp)
                 time.sleep(temp/random.randint(70,200))
+
         else:
                 functionbleh(random.uniform(0.00000006, 0.0000002)*temp, random.uniform(0.00000004, 0.00002)*temp, int(temp/2))
     time.sleep(6)
@@ -252,8 +272,10 @@ def mostlyCloudy(temp, wind):
 def aFewClouds(temp, wind):
     wind = float(wind)
     wind = 2.5 + wind
+
     if temp < 20:
         temp = 19
+
     functionbleh(0.0015*wind, 0.0001*temp, 10)
     nathanAllFreak(int(temp/12),int(temp/20),50,random.uniform(0.001,0.003))
     functionbleh1(0.0024*wind, 0.0004*temp, int(temp*0.6))
@@ -267,8 +289,10 @@ def aFewClouds(temp, wind):
     functionbleh(0.00033*temp, 0.00008*temp, wind*2)
 
 def fair(temp, wind):
+
     if temp < 20:
         temp = 20
+
     wind = float(wind)
     nathanBeat(0.00149*temp, 0.00011*(wind*5), int(temp*0.4))
     nathanRain(temp, wind, 0.4,  int(wind*2))
@@ -288,6 +312,7 @@ def fair(temp, wind):
     functionbleh(0.00009*temp, 0.00008*temp, temp)
 
 def clear(temp, windSpeed):
+
     nathanRain(temp*3, windSpeed*10, random.uniform(0.2,0.8), int(temp));
     nathanRain(temp*4, windSpeed*8, random.uniform(0.2,0.8), int(windSpeed * 7));
     nathanRain(temp*3.2, windSpeed*10, random.uniform(0.2,0.8), int(temp + windSpeed));
@@ -324,11 +349,6 @@ def thunderstorm(temp):
 #-------------------------------------------------
 
 noaa_station_names = ['VWS', 'PFAL', 'KJFK', 'PAMR', 'KEET', 'ASPA', 'TT127', 'MABL', 'MACR', 'CCSL', 'KAJO', 'KPSP', 'RFN', 'KRCV', 'SA00', 'SV', 'TO', 'BBY4', 'KAJO','KSNC', 'KIJL', 'AN120', 'D1189', 'NA2', 'BRTW',  'BALM', 'PGUM', '52200', 'PHHN', 'AR427', 'KFEP', 'SG04', 'KCBK','KFSK', 'LSUA', 'KAUD', 'k01T', '1LSU', 'KCHI', 'PHII', 'KOK1', 'K8A0', 'KHKA', 'KBYH', 'KCMD', 'KVOA', 'K4C0', 'KQT8', 'KQT9','KP92', 'EPO', 'BARH', 'BRU5', 'KBXM', 'UNIV', 'SOWR', 'SUP1', 'LANS','K96D','KBAC','NSTU','PPG01', 'TT126', '51181', 'LATP6', 'NSTP6', 'MTCP7','WWHP7', 'PWAK', 'DDDP7', 'C6666', 'KLBL', 'KIAB', 'KAAO', 'MAOP4', 'SLMP4', 'YAHP4','KBHX', 'K064', 'KMHV', 'KMHS','BLDN8', 'AFRP4', 'MOCP4', 'YABP4', 'LTBV3', 'D8627', '41051', '91S', 'KZSE', 'K91S', 'CHAW', 'KCLS', 'AGKO', 'BATO', 'BANO', 'BEWO', 'K1B5', 'KOLD', 'K96B','MRSNV']
-print("|||||||||||||||||||||||||||||||||||||||||||||||||")
-print(noaa_station_names)
-print("|||||||||||||||||||||||||||||||||||||||||||||||||")
-noaa_result = pywapi.get_weather_from_noaa('KJFK')
-
 
 #-------------------------------------------------
 #                 Say Functions
@@ -348,18 +368,14 @@ def sayNOAA():
 
 temp_f = 70
 weather = 'sunny'
-windchill_f =  12
-sugested_pickup_period = 24
-suggested_pickup = 30
-dewpoint_f = 60
 location = 'location'
 wind_speed = 23
 wind_dir = 'west'
-wind_degrees = 280
-pressure_in = 'pressure_in'
-longitude = 240
-latitude = 300
-relative_humidity = 80
+
+print("|||||||||||||||||||||||||||||||||||||||||||||||||")
+print(noaa_station_names)
+print("|||||||||||||||||||||||||||||||||||||||||||||||||")
+noaa_result = pywapi.get_weather_from_noaa('KJFK')
 
 while True:
     random_station_name = noaa_station_names[random.randint(0, len(noaa_station_names) - 1)]
@@ -379,7 +395,6 @@ while True:
         nathanAllFreak(random.randint(1,3),random.randint(1,3),random.randint(100,250),random.uniform(0.00006,0.001))
         time.sleep(random.uniform(0.01,0.6))
 
-
     elif 'temp_f' and 'weather' and 'location' and 'wind_degrees' and 'wind_mpf' and 'wind_dir'  in  noaa_result:
 
 
@@ -390,9 +405,8 @@ while True:
             wind_speed = float(noaa_result['wind_mph'])
             if wind_speed < 3:
                 wind_speed = 3
-            print("wind_mph             : ", wind_speed)
+            print("wind_mph             :",wind_speed)
             wind_dir = noaa_result['wind_dir']
-            #print("wind_dir : ", wind_dir)
 
             if 'temp_f' in noaa_result:
                 temp_f = float(noaa_result['temp_f'])
@@ -407,9 +421,11 @@ while True:
                 time.sleep(5.1)
                 if random.randint(0,100) == 1:
                     weather = 'Thunderstorm'
+                    print("------------------------------")
                     print("|||||||||||||||||||||||||")
                     print("VETO TO THUNDERSTORM")
                     print("|||||||||||||||||||||||||")
+                    print("------------------------------")
                 #weather = 'Thunderstorm'
                 #weather = 'Overcast'
                 #weather = 'Mostly Cloudy'
@@ -419,11 +435,32 @@ while True:
                 #weather = 'Clear'
                 #weather = 'Car'
 
-                if weather == 'Mostly Cloudy':
+                if 'Fog' in weather:
+                    wind_speed = wind_speed*0.5
+                    temp_f = temp_f * 2
+                    print("------------------------------")
+                    print("Fog detected, wind speed changed to : ", wind_speed, " temp changed to : ", temp_f)
+                    print("------------------------------")
+
+                if 'Mist' in weather:
+                    wind_speed = wind_speed * 1.5
+                    temp_f = temp_f * 0.75
+                    print("------------------------------")
+                    print("Mist detected wind speed changed to : ", wind_speed, " Temp changed to : ", temp_f)
+                    print("------------------------------")
+
+                if 'Breezy' in weather:
+                    wind_speed = wind_speed * 2.25:
+                    print("------------------------------")
+                    print("Breeze detected wind speed changed to : ", wind_speed)
+                    print("------------------------------")
+
+                if weather[:13] == 'Mostly Cloudy':
                     sayNOAA()
                     time.sleep(1.5)
                     if temp_f < 10:
                         temp_f = 10
+                    print("------------------------------")
                     print("Mostly Cloudy Match")
                     print("------------------------------")
                     mostlyCloudy(temp_f, wind_speed)
@@ -434,15 +471,17 @@ while True:
                 elif weather[:13] == 'Partly Cloudy':
                     sayNOAA()
                     time.sleep(1.5)
+                    print("------------------------------")
                     print("Partly Cloudy Match")
                     print("------------------------------")
                     clearSnappers()
                     partlyCloudy(int(temp_f*1.55), wind_speed*0.5)
                     clearSnappers()
 
-                elif weather == 'Clear':
+                elif weather[:5] == 'Clear':
                     sayNOAA()
                     time.sleep(1.5)
+                    print("------------------------------")
                     print("Clear Match");
                     print("------------------------------")
                     clearSnappers()
@@ -451,9 +490,10 @@ while True:
                     clear(temp_f*0.75, wind_speed)
                     clearSnappers()
 
-                elif weather == 'Overcast' or weather == 'Fog/Mist' or weather == 'Fair with Haze':
+                elif weather[:8] == 'Overcast' or weather[:8] == 'Fog/Mist' or weather[:14] == 'Fair with Haze':
                     sayNOAA()
                     time.sleep(1.5)
+                    print("------------------------------")
                     print("Overcast Match")
                     print("------------------------------")
                     clearSnappers()
@@ -467,7 +507,7 @@ while True:
                     time.sleep((temp_f*0.2) + (wind_speed*0.5) + 6)
                     clearSnappers()
 
-                elif weather == 'Fair':
+                elif weather[:4] == 'Fair':
                     if(temp_f < 14):
                         temp_f = 14
                     chance = random.randint(0,4)
@@ -475,23 +515,27 @@ while True:
                         sayNOAA()
                         time.sleep(1.5)
                         clearSnappers()
+                        print("------------------------------")
                         print("Fair Match")
                         print("------------------------------")
                         fair(temp_f, (wind_speed + 5))
                         clearSnappers()
                     elif (chance == 2):
+                        print("------------------------------")
                         print("Fair Clear match")
                         print("------------------------------")
                         clear(temp_f*0.725, wind_speed*1.55)
                         clear(temp_f*1.2, wind_speed*1.15)
                         clear(temp_f*1.725, wind_speed*0.75)
                     else:
+                        print("------------------------------")
                         print("rejecting Fair : too common")
                         print("------------------------------")
 
-                elif weather == 'A Few Clouds':
+                elif weather[:12] == 'A Few Clouds':
                     sayNOAA()
                     time.sleep(3)
+                    print("------------------------------")
                     print("A Few Clouds Match")
                     print("------------------------------")
                     clearSnappers()
@@ -499,9 +543,10 @@ while True:
                     aFewClouds(temp_f*2, wind_speed*0.5)
                     clearSnappers()
 
-                elif weather == 'Thunderstorm':
+                elif weather[:12] == 'Thunderstorm':
                     sayNOAA()
                     time.sleep(3)
+                    print("------------------------------")
                     print("ThunderStorm Match")
                     print("------------------------------")
                     clearSnappers()
@@ -513,11 +558,17 @@ while True:
                     thunderstorm(temp_f*random.uniform(0.4,3))
                     clearSnappers()
                 else :
+                    print("------------------------------")
                     print("Printing the Values : ", noaa_values)
+                    print("------------------------------")
                     print("No Match")
+                    print("------------------------------")
                     print("No Match")
+                    print("------------------------------")
                     print("No Match")
+                    print("------------------------------")
                     print("No Match")
+                    print("------------------------------")
                     sayNOAA()
                     clearSnappers()
                     thunderstorm(temp_f*random.uniform(0.1,2.4))
