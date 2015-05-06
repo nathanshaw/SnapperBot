@@ -5,7 +5,6 @@ nathan villicana-shaw
 
 revision: 001
 
-
 .... ....  .... ....  .... ....
   byte 0     byte 1    byte 2
 
