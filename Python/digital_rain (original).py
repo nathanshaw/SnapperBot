@@ -426,7 +426,7 @@ noaa_station_names = ['VWS', 'PFAL', 'KJFK', 'PAMR', 'KEET', 'ASPA', 'TT127', 'M
 def sayNOAA():
 
     chance = random.randint(0,3)
-    if chance < 2:
+    if chance < 3:
         system('say ' +  "It is " + str(weather) + " and " + str(temp_f) + " Fahrenheit  now in " + locationi  + " , ... And the wind blows " + str(wind_dir) + " At " + str(wind_speed) + " Miles Per Hour " + "&\n" )
     elif chance == 3:
         system('say ' +  "In  " + str(locationi) + " it is " + str(weather) +  " ,... And the wind blows at" + str(wind_speed) + " Miles Per Hour " + str(wind_dir) + "&\n" )
@@ -562,7 +562,7 @@ while True:
                 elif weather[:4] == 'Fair':
                     if(temp_f < 14):
                         temp_f = 14
-                    chance = random.randint(0,4)
+                    chance = random.randint(0,6)
                     if(chance < 1):
                         time.sleep(2)
                         sayNOAA()
@@ -681,9 +681,9 @@ while True:
                     time.sleep(2)
                     sayNOAA()
                     clearSnappers()
-                    thunderstorm(temp_f*random.uniform(0.1,2.4))
-                    thunderstorm(temp_f*random.uniform(.4,.17))
-                    thunderstorm(temp_f*random.uniform(0.2,1))
+                    thunderstorm(temp_f*random.uniform(0.1,2.4), wind_speed)
+                    thunderstorm(temp_f*random.uniform(.4,.17), wind_speed)
+                    thunderstorm(temp_f*random.uniform(0.2,1), wind_speed)
                     clearSnappers()
                     #noMatch(temp_f)
 
