@@ -560,8 +560,8 @@ while True:
                     clearSnappers()
 
                 elif weather[:4] == 'Fair':
-                    if(temp_f < 14):
-                        temp_f = 14
+                    if(wind_speed < 14):
+                        windspeed = 14
                     chance = random.randint(0,6)
                     if(chance < 1):
                         time.sleep(2)
