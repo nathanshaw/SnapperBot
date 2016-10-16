@@ -32,7 +32,7 @@ uint8_t botNum;
 
 // For working with the robots server
 char bytes[2];
-int handshake = 0
+int handshake = 0;
 
 //
 //////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -75,7 +75,7 @@ void flipSwitch(uint8_t array, uint8_t swit) {
 //
 void loud(uint8_t snapArray, uint8_t level) {
   //change the states of the appropiate snappers
-  level = int(level/16)
+  level = int(level / 16);
   snapperStates[snapArray] ^= (255 >> (8 - level));
   //write to all the ports
   setPorts(4);
@@ -85,23 +85,23 @@ void loud(uint8_t snapArray, uint8_t level) {
 //                              Serial Stuff
 //////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 //
-
+int pitch = 0;
+int velocity = 127;
 void serialListener() {
-    if (Serial.available()) {
-        if (Serial.read() == 0xff) {
-            Serial.readBytes(bytes, 2);
-            int pitch = byte(bytes[0] >> 2;
-            int velocity = (byte(bytes[0]) << 8 | byte(bytes[1]))
-            if (bytes[0] == 0xff && bytes[1] == 0xff && handshake == 0) {
-                    Serial.write(arduinoID)
-                    handshake = 1;
-                }
-            }
-            else {
-                loud(pitch, velocity)
-            }
-        }
+  if (Serial.available()) {
+    if (Serial.read() == 0xff) {
+      Serial.readBytes(bytes, 2);
+      pitch = byte(bytes[0]) >> 2;
+      velocity = (byte(bytes[0]) << 8 | byte(bytes[1]));
+      if (bytes[0] == 0xff && bytes[1] == 0xff && handshake == 0) {
+        Serial.write(arduinoID);
+        handshake = 1;
+      }
     }
+    else {
+      loud(pitch, velocity);
+    }
+  }
 }
 //////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 //                             Test Loops
@@ -120,7 +120,7 @@ void startupTest() {
     }
   }
   for (int i = 1; i < 9; i++) {
-    veryLoud(i);
+    loud(2, i);
     delay(27);
   }
 }
