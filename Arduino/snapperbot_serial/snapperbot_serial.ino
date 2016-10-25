@@ -32,7 +32,7 @@ uint8_t botNum;
 
 // For working with the robots server
 // snapperbot ID's are between 3 and 9
-#define arduinoID 3
+#define arduinoID 5
 char bytes[2];
 int handshake = 0;
 
@@ -107,69 +107,38 @@ void loud(uint8_t snapArray, uint8_t level) {
 //                              Serial Stuff
 //////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 //
-void byteListener() {
-  //if we have serial data in the buffer
-  while (Serial.available()) {
-    if (Serial.available()) {
-
-      //read the first byte
-      Serial.readBytes((char*)dataBytes, 3);
-      //if it is equal to our flag value
-      if (dataBytes[0] == 0xff) {
-        //Serial.print("Bot Num : ");
-        //Serial.print(dataBytes[1]);
-        //Serial.print("Data Byte : ");
-        //Serial.println(dataBytes[2]);
-        parseSerial(dataBytes[1], dataBytes[2]);
-      }
-      else {
-        Serial.flush();
-      }
-    }
-  }
-}
 
 void serialListener() {
-    if (Serial.available()) {
-        if (Serial.read() == 0xff) {
-            Serial.readBytes(bytes, 2);
-            if (bytes[0] == 0xff && bytes[1] == 0xff && handshake == 0) {
-                    Serial.write(arduinoID);
-                    handshake = 1;
-            }
-            
-            else {
-                parseSerial(bytes[0], bytes[1]);
-            }
-        }
+   if (Serial.available()) {
+    if (Serial.read() == 0xff) {
+      // reads in a two index array from ChucK
+      Serial.readBytes(bytes, 2);
+      // bit wise operations
+      // ~~~~~~~~~~~~~~~~~~~
+      // reads the first six bits for the note number
+      // then reads the last ten bits for the note velocity
+      int pitch = byte(bytes[0]) >> 2;
+      int velocity = (byte(bytes[0]) << 8 | byte(bytes[1])) & 1023;
+      // message required for "handshake" to occur
+      // happens once per Arduino at the start of the ChucK serial code
+      if (pitch == 63 && velocity == 1023 && handshake == 0) {
+        Serial.write(arduinoID);
+        handshake = 1;
+      }   
+      if (pitch >= 0 && pitch <= 4) {
+        parseSerial(pitch, velocity);
+      }
     }
+  }
 }
 //
-void parseSerial(byte botNum, byte data) {
+void parseSerial(int botNum, int numswitches) {
   //the masterbot is bot 0
-
-  if (botNum == 0) {
-    //the mode is the 2 most significant bits
-    //shift those bits over 6 spaces and we have the mode
-    mode = (data >> 6);
-    //flip one switch is mode is = 0
-    if (mode == 0) {
-      //apply bitmasks and shift over the bits we are interested in and pass them into flipSwitch
-      flipSwitch((data & 0x30) >> 4, (1 >> (data & 0x0C)));
-    }
-    else if (mode == 1) {
-      //apply bitmasks and shift over the bits we are interested in and pass them into loud
-      loud((data & 0x30) >> 4, (data & 0x0E) >> 1);
-    }
-    else if (mode == 2) {
-      //apply bitmasks and shift over the bits we are interested in and pass them into veryLoud
-      veryLoud(data & 0x38 >> 3);
-    }
+  numswitches = int(numswitches/16);
+  if (numswitches > 8) {
+    numswitches = 8;
   }
-  //if message is for a slaveBot pass it on to the corrisponding slave
-  else {
-    sendI2C(botNum, data);
-  }
+  loud(botNum, numswitches);
 }
 //////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 //                             Test Loops
