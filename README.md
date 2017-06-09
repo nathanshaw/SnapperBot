@@ -1,3 +1,5 @@
+![Snapper bots as seen in Digital Rain installation](https://i0.wp.com/bitdeph.com/wp-content/uploads/2015/03/Digital_rain_LQ_01.jpg)
+
 # SnapperBot code
 A rotary switch music robot system
 
